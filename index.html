@@ -295,21 +295,6 @@
       line-height:1.55;
       font-size:14px;
     }
-    .rk-switch{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      border:1px solid var(--rk-border);
-      background:var(--rk-surface2);
-      padding: 8px 10px;
-      border-radius:999px;
-      color:var(--rk-muted);
-      font-size: 13px;
-      margin-top: 10px;
-      width: fit-content;
-    }
-    .rk-switch input{ accent-color: var(--rk-accent); }
-
     .rk-footer{
       padding: 12px 18px 16px 18px;
       border-top: 1px solid var(--rk-border);
@@ -400,12 +385,6 @@
                   AI behavior changes are hard to root-cause because prompts, model settings, and tool responses drift over time.
                   ReplayKit is designed to answer: "Why did this run behave differently?"
                 </p>
-
-                <label class="rk-switch">
-                  <span>Before</span>
-                  <input type="checkbox" id="toggle" />
-                  <span>After</span>
-                </label>
 
                 <div class="rk-compare">
                   <div class="rk-compare-header">
@@ -534,59 +513,5 @@ replaykit diff --base runs/baseline.rpk --head runs/new_prompt.rpk</code></pre>
       </footer>
     </section>
   </div>
-
-  <script>
-    const t = document.getElementById("toggle");
-    const leftTitle = document.getElementById("leftTitle");
-    const rightTitle = document.getElementById("rightTitle");
-    const leftList = document.getElementById("leftList");
-    const rightList = document.getElementById("rightList");
-
-    const BEFORE = {
-      lt: "Without ReplayKit",
-      rt: "With ReplayKit",
-      l: [
-        "Non-deterministic changes are hard to debug",
-        "Logs are incomplete or too sensitive to share",
-        "Reproductions depend on external services staying identical",
-        "It is difficult to isolate the first breaking change"
-      ],
-      r: [
-        "Deterministic .rpk artifacts for stable replay",
-        "Offline replay (stub) plus selective rerun (hybrid)",
-        "Structured diff with first-divergence detection",
-        "Redacted bundle export plus integrity verification"
-      ]
-    };
-
-    const AFTER = {
-      lt: "After (Symptoms)",
-      rt: "After (ReplayKit Fix)",
-      l: [
-        "A model or provider update changes output shape",
-        "A tool response drifts or times out",
-        "RAG retrieval returns different documents",
-        "One prompt tweak creates a cascade"
-      ],
-      r: [
-        "Capture boundary events into stable artifacts",
-        "Replay offline to remove external variability",
-        "Diff identifies earliest mismatch (first divergence)",
-        "Share redacted bundles for review"
-      ]
-    };
-
-    function render(state){
-      leftTitle.textContent = state.lt;
-      rightTitle.textContent = state.rt;
-      leftList.innerHTML = state.l.map((item) => "<li>" + item + "</li>").join("");
-      rightList.innerHTML = state.r.map((item) => "<li>" + item + "</li>").join("");
-    }
-
-    if (t && leftTitle && rightTitle && leftList && rightList){
-      render(BEFORE);
-      t.addEventListener("change", () => render(t.checked ? AFTER : BEFORE));
-    }
-  </script>
 </body>
 </html>
