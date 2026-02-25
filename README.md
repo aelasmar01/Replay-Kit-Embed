@@ -33,6 +33,14 @@ If you need raw HTML for another host, use:
 
 Tabs are implemented with CSS-only radio/label controls (no JavaScript required), so navigation works in restrictive embed environments such as Google Sites.
 
+## Upstream ReplayKit Docs (Verified)
+
+These links were verified on **February 25, 2026**:
+
+- Repository: `https://github.com/golden0320230-lab/Replay-Kit`
+- Quickstart: `https://github.com/golden0320230-lab/Replay-Kit/blob/main/README.md#quickstart-runnable-now`
+- Docs index: `https://github.com/golden0320230-lab/Replay-Kit/tree/main/docs`
+
 ## Troubleshooting
 
 - If tabs do not appear to switch in the Google Sites editor canvas, test with `Preview` and the published page first.
