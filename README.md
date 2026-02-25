@@ -12,7 +12,7 @@ Use the GitHub Pages URL in Google Sites:
 
 1. In Google Sites, choose `Insert` -> `Embed`.
 2. Select the `By URL` tab.
-3. Paste `https://aelasmar01.github.io/Replay-Kit-Embed/`.
+3. Paste `https://aelasmar01.github.io/Replay-Kit-Embed/#rk-overview`.
 4. Resize the embed to a recommended height of `1100px` (minimum `980px`).
 5. Verify behavior in both `Preview` and the published page.
 
@@ -20,7 +20,7 @@ If you need raw HTML for another host, use:
 
 ```html
 <iframe
-  src="https://aelasmar01.github.io/Replay-Kit-Embed/"
+  src="https://aelasmar01.github.io/Replay-Kit-Embed/#rk-overview"
   title="ReplayKit Portfolio Embed"
   width="100%"
   height="1100"
@@ -31,7 +31,7 @@ If you need raw HTML for another host, use:
 
 ## Compatibility Note
 
-Tabs are implemented with CSS-only radio/label controls (no JavaScript required), so navigation works in restrictive embed environments such as Google Sites.
+Tabs are implemented with CSS-only `:target` anchors (no JavaScript and no form controls required), so navigation works in restrictive embed environments such as Google Sites.
 
 ## Upstream ReplayKit Docs (Verified)
 
