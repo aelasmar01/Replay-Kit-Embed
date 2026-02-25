@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ReplayKit Embed</title>
+  <style>
+    /* ===== Your embed styles (HIGH-CONTRAST, light-first) ===== */
+    :root{
+      --rk-radius: 18px;
+      --rk-shadow: 0 18px 55px rgba(0,0,0,.12);
+      --rk-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --rk-sans: system-ui,-apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+    }
+    body{ margin:0; background:#fff; font-family:var(--rk-sans); }
+    .wrap{ padding: 0; }
+
+    #replaykit-embed{
+      --rk-bg:#fff;
+      --rk-surface:#fff;
+      --rk-surface2:#f6f7fb;
+      --rk-border: rgba(0,0,0,.10);
+      --rk-text: rgba(0,0,0,.92);
+      --rk-muted: rgba(0,0,0,.70);
+      --rk-dim: rgba(0,0,0,.55);
+      --rk-accent:#5b4bff;
+      --rk-good:#16a34a;
+
+      max-width: 1100px;
+      margin: 0 auto;
+      border-radius: var(--rk-radius);
+      background:
+        radial-gradient(900px 520px at 15% 0%, rgba(91,75,255,.14), transparent 55%),
+        radial-gradient(700px 420px at 85% 10%, rgba(22,163,74,.10), transparent 55%),
+        linear-gradient(180deg, rgba(0,0,0,.02), transparent),
+        var(--rk-bg);
+      border: 1px solid var(--rk-border);
+      box-shadow: var(--rk-shadow);
+      overflow: hidden;
+      color: var(--rk-text);
+      font-family: var(--rk-sans);
+    }
+    #replaykit-embed *{ box-sizing:border-box; }
+
+    .rk-hero{
+      padding: 18px 18px 14px 18px;
+      display:flex;
+      gap: 14px;
+      align-items:flex-start;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      border-bottom: 1px solid var(--rk-border);
+      background: linear-gradient(180deg, rgba(0,0,0,.02), transparent);
+    }
+    .rk-title{ min-width: 280px; flex:1; }
+    .rk-title h2{
+      margin:0;
+      font-size: 22px;
+      letter-spacing: .2px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .rk-pill{
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--rk-border);
+      background: var(--rk-surface2);
+      color: var(--rk-muted);
+    }
+    .rk-sub{
+      margin: 10px 0 0 0;
+      color: var(--rk-muted);
+      line-height: 1.55;
+      font-size: 14px;
+      max-width: 72ch;
+    }
+
+    .rk-actions{
+      display:flex; gap: 10px; flex-wrap:wrap;
+      margin-top: 12px;
+    }
+    .rk-btn{
+      display:inline-flex; align-items:center; gap: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--rk-border);
+      text-decoration:none;
+      color: var(--rk-text);
+      background: var(--rk-surface2);
+      transition: transform .12s ease, box-shadow .12s ease;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    .rk-btn:hover{ transform: translateY(-1px); box-shadow: 0 10px 25px rgba(0,0,0,.08); }
+    .rk-btn.primary{
+      background: linear-gradient(135deg, rgba(91,75,255,.95), rgba(91,75,255,.70));
+      border-color: rgba(91,75,255,.55);
+      color: #fff;
+    }
+
+    .rk-meta{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; min-width:280px;}
+    .rk-badge{
+      font-size: 12px;
+      color: var(--rk-muted);
+      border: 1px solid var(--rk-border);
+      background: var(--rk-surface);
+      padding: 7px 10px;
+      border-radius: 14px;
+      display:flex;
+      gap: 8px;
+      align-items:center;
+    }
+    .rk-dot{ width: 8px; height: 8px; border-radius:50%; background: rgba(0,0,0,.25); }
+    .rk-dot.good{ background: var(--rk-good); box-shadow: 0 0 0 3px rgba(22,163,74,.18); }
+    .rk-dot.accent{ background: var(--rk-accent); box-shadow: 0 0 0 3px rgba(91,75,255,.18); }
+
+    .rk-tabs{ display:flex; gap:8px; flex-wrap:wrap; padding:12px 12px 0 12px;}
+    .rk-tab{
+      border: 1px solid var(--rk-border);
+      background: var(--rk-surface2);
+      color: var(--rk-muted);
+      padding: 9px 12px;
+      border-radius: 14px;
+      cursor:pointer;
+      font-size: 13px;
+      user-select:none;
+    }
+    .rk-tab[aria-selected="true"]{
+      color: var(--rk-text);
+      background: rgba(91,75,255,.16);
+      border-color: rgba(91,75,255,.40);
+    }
+
+    .rk-panels{ padding: 12px; display:grid; gap: 12px; }
+    .rk-panel{
+      border: 1px solid var(--rk-border);
+      background: var(--rk-surface);
+      border-radius: var(--rk-radius);
+      padding: 14px;
+    }
+    .rk-panel h3{
+      margin:0;
+      font-size: 13px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--rk-dim);
+    }
+    .rk-panel p{
+      margin: 10px 0 0 0;
+      color: var(--rk-muted);
+      line-height: 1.6;
+      font-size: 14px;
+    }
+    .rk-grid-2{ display:grid; grid-template-columns: 1.15fr .85fr; gap: 12px; }
+    @media (max-width: 980px){ .rk-grid-2{ grid-template-columns: 1fr; } .rk-meta{justify-content:flex-start;} }
+
+    .rk-compare{
+      margin-top: 12px;
+      border-radius: 16px;
+      border: 1px solid var(--rk-border);
+      overflow:hidden;
+      background: var(--rk-surface);
+    }
+    .rk-compare-header{
+      display:grid; grid-template-columns: 1fr 1fr;
+      border-bottom: 1px solid var(--rk-border);
+      background: var(--rk-surface2);
+    }
+    .rk-compare-header div{
+      padding: 10px 12px;
+      font-size: 12px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--rk-dim);
+    }
+    .rk-compare-body{ display:grid; grid-template-columns: 1fr 1fr; }
+    .rk-compare-col{ padding: 12px; border-right: 1px solid var(--rk-border); }
+    .rk-compare-col:last-child{ border-right:none; }
+    .rk-compare-col ul{ margin:0; padding-left:18px; color:var(--rk-muted); line-height:1.55; font-size:14px;}
+    @media (max-width: 760px){
+      .rk-compare-header,.rk-compare-body{ grid-template-columns:1fr; }
+      .rk-compare-col{ border-right:none; border-bottom:1px solid var(--rk-border); }
+      .rk-compare-col:last-child{ border-bottom:none; }
+    }
+
+    .rk-switch{
+      display:flex; align-items:center; gap:10px;
+      border:1px solid var(--rk-border);
+      background:var(--rk-surface2);
+      padding: 8px 10px;
+      border-radius:999px;
+      color:var(--rk-muted);
+      font-size: 13px;
+      margin-top: 10px;
+      width: fit-content;
+    }
+    .rk-switch input{ accent-color: var(--rk-accent); }
+
+    .rk-footer{
+      padding: 12px 18px 16px 18px;
+      border-top: 1px solid var(--rk-border);
+      color: var(--rk-dim);
+      font-size: 12.5px;
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
+      justify-content:space-between;
+      background: var(--rk-surface2);
+    }
+    .rk-footer a{ color: rgba(0,0,0,.75); text-decoration:none; border-bottom:1px dotted rgba(0,0,0,.25); }
+    .rk-footer a:hover{ color: rgba(0,0,0,.92); border-bottom-color: rgba(0,0,0,.55); }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section id="replaykit-embed">
+      <header class="rk-hero">
+        <div class="rk-title">
+          <h2>
+            ReplayKit
+            <span class="rk-pill">Deterministic AI record • replay • diff</span>
+            <span class="rk-pill">Local-first</span>
+          </h2>
+          <p class="rk-sub">
+            A local-first debugging toolkit for AI workflows that records deterministic artifacts, replays offline,
+            and diffs runs to find the first divergence.
+          </p>
+          <div class="rk-actions">
+            <a class="rk-btn primary" href="https://github.com/golden0320230-lab/Replay-Kit" target="_blank" rel="noopener">View Repo ↗</a>
+            <a class="rk-btn" href="https://github.com/golden0320230-lab/Replay-Kit#quickstart-runnable-now" target="_blank" rel="noopener">Quickstart</a>
+            <a class="rk-btn" href="https://github.com/golden0320230-lab/Replay-Kit/tree/main/docs" target="_blank" rel="noopener">Docs</a>
+          </div>
+        </div>
+
+        <div class="rk-meta">
+          <div class="rk-badge"><span class="rk-dot accent"></span> CI: Linux • macOS • Windows</div>
+          <div class="rk-badge"><span class="rk-dot good"></span> Python: 3.10+ (CI: 3.12)</div>
+          <div class="rk-badge"><span class="rk-dot"></span> Artifacts: .rpk</div>
+        </div>
+      </header>
+
+      <nav class="rk-tabs" aria-label="ReplayKit sections">
+        <div class="rk-tab" aria-selected="true">Overview</div>
+        <div class="rk-tab" aria-selected="false">Architecture</div>
+        <div class="rk-tab" aria-selected="false">Demo</div>
+        <div class="rk-tab" aria-selected="false">Security</div>
+        <div class="rk-tab" aria-selected="false">Artifact Explorer</div>
+      </nav>
+
+      <div class="rk-panels">
+        <div class="rk-panel">
+          <div class="rk-grid-2">
+            <div>
+              <h3>Why it matters</h3>
+              <p>
+                AI behavior changes are hard to root-cause because prompts, model settings, and tool responses drift over time.
+                ReplayKit is designed to answer: “Why did this run behave differently?”
+              </p>
+
+              <label class="rk-switch">
+                <span>Before</span>
+                <input type="checkbox" id="toggle" />
+                <span>After</span>
+              </label>
+
+              <div class="rk-compare">
+                <div class="rk-compare-header">
+                  <div id="leftTitle">Without ReplayKit</div>
+                  <div id="rightTitle">With ReplayKit</div>
+                </div>
+                <div class="rk-compare-body">
+                  <div class="rk-compare-col">
+                    <ul id="leftList">
+                      <li>Non-deterministic changes are “vibes-based” to debug</li>
+                      <li>Logs are incomplete or too sensitive to share</li>
+                      <li>Reproductions depend on external services staying identical</li>
+                      <li>Hard to isolate the first breaking change</li>
+                    </ul>
+                  </div>
+                  <div class="rk-compare-col">
+                    <ul id="rightList">
+                      <li>Deterministic .rpk artifacts for stable replay</li>
+                      <li>Offline replay (stub) + selective rerun (hybrid)</li>
+                      <li>Structured diff with first-divergence detection</li>
+                      <li>Redacted bundle export + integrity verification</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3>What it demonstrates</h3>
+              <p>
+                Determinism engineering, provider-agnostic capture, security-first redaction defaults, and cross-platform CI validation.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer class="rk-footer">
+        <div>Determinism engineering • Debug ergonomics • Security-first artifacts</div>
+        <div><a href="https://github.com/golden0320230-lab/Replay-Kit" target="_blank" rel="noopener">ReplayKit on GitHub</a></div>
+      </footer>
+    </section>
+  </div>
+
+  <script>
+    const t = document.getElementById("toggle");
+    const leftTitle = document.getElementById("leftTitle");
+    const rightTitle = document.getElementById("rightTitle");
+    const leftList = document.getElementById("leftList");
+    const rightList = document.getElementById("rightList");
+
+    const BEFORE = {
+      lt: "Without ReplayKit",
+      rt: "With ReplayKit",
+      l: [
+        "Non-deterministic changes are “vibes-based” to debug",
+        "Logs are incomplete or too sensitive to share",
+        "Reproductions depend on external services staying identical",
+        "Hard to isolate the first breaking change"
+      ],
+      r: [
+        "Deterministic .rpk artifacts for stable replay",
+        "Offline replay (stub) + selective rerun (hybrid)",
+        "Structured diff with first-divergence detection",
+        "Redacted bundle export + integrity verification"
+      ]
+    };
+
+    const AFTER = {
+      lt: "After (Symptoms)",
+      rt: "After (ReplayKit Fix)",
+      l: [
+        "A model/provider update changes output shape",
+        "A tool response drifts or times out",
+        "RAG retrieval returns different docs",
+        "One prompt tweak creates a cascade"
+      ],
+      r: [
+        "Capture boundary events into stable artifacts",
+        "Replay offline to remove external variability",
+        "Diff identifies earliest mismatch (first divergence)",
+        "Share redacted bundles for review"
+      ]
+    };
+
+    function render(s){
+      leftTitle.textContent = s.lt;
+      rightTitle.textContent = s.rt;
+      leftList.innerHTML = s.l.map(x=>`<li>${x}</li>`).join("");
+      rightList.innerHTML = s.r.map(x=>`<li>${x}</li>`).join("");
+    }
+    render(BEFORE);
+    t.addEventListener("change", ()=> render(t.checked ? AFTER : BEFORE));
+  </script>
+</body>
+</html>
