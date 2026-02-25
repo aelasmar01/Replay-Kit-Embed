@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>ReplayKit Embed</title>
   <style>
-    /* ===== Your embed styles (HIGH-CONTRAST, light-first) ===== */
     :root{
       --rk-radius: 18px;
       --rk-shadow: 0 18px 55px rgba(0,0,0,.12);
       --rk-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
-      --rk-sans: system-ui,-apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+      --rk-sans: system-ui,-apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", sans-serif;
     }
+
     body{ margin:0; background:#fff; font-family:var(--rk-sans); }
     .wrap{ padding: 0; }
 
@@ -79,11 +79,15 @@
     }
 
     .rk-actions{
-      display:flex; gap: 10px; flex-wrap:wrap;
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
       margin-top: 12px;
     }
     .rk-btn{
-      display:inline-flex; align-items:center; gap: 10px;
+      display:inline-flex;
+      align-items:center;
+      gap: 10px;
       padding: 10px 12px;
       border-radius: 14px;
       border: 1px solid var(--rk-border);
@@ -101,7 +105,13 @@
       color: #fff;
     }
 
-    .rk-meta{ display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; min-width:280px;}
+    .rk-meta{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      min-width:280px;
+    }
     .rk-badge{
       font-size: 12px;
       color: var(--rk-muted);
@@ -117,7 +127,25 @@
     .rk-dot.good{ background: var(--rk-good); box-shadow: 0 0 0 3px rgba(22,163,74,.18); }
     .rk-dot.accent{ background: var(--rk-accent); box-shadow: 0 0 0 3px rgba(91,75,255,.18); }
 
-    .rk-tabs{ display:flex; gap:8px; flex-wrap:wrap; padding:12px 12px 0 12px;}
+    .rk-tabset{ position: relative; }
+    .rk-tab-input{
+      position:absolute;
+      width:1px;
+      height:1px;
+      margin:-1px;
+      border:0;
+      padding:0;
+      clip: rect(0 0 0 0);
+      clip-path: inset(50%);
+      overflow:hidden;
+      white-space:nowrap;
+    }
+    .rk-tabs{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      padding:12px 12px 0 12px;
+    }
     .rk-tab{
       border: 1px solid var(--rk-border);
       background: var(--rk-surface2);
@@ -127,15 +155,40 @@
       cursor:pointer;
       font-size: 13px;
       user-select:none;
+      line-height: 1.2;
+      transition: background-color .12s ease, border-color .12s ease, color .12s ease;
     }
-    .rk-tab[aria-selected="true"]{
+    .rk-tab:hover{
+      color: var(--rk-text);
+      border-color: rgba(91,75,255,.35);
+    }
+
+    #rk-tab-overview:checked ~ .rk-tabs label[for="rk-tab-overview"],
+    #rk-tab-architecture:checked ~ .rk-tabs label[for="rk-tab-architecture"],
+    #rk-tab-demo:checked ~ .rk-tabs label[for="rk-tab-demo"],
+    #rk-tab-security:checked ~ .rk-tabs label[for="rk-tab-security"],
+    #rk-tab-artifact:checked ~ .rk-tabs label[for="rk-tab-artifact"]{
       color: var(--rk-text);
       background: rgba(91,75,255,.16);
       border-color: rgba(91,75,255,.40);
     }
 
-    .rk-panels{ padding: 12px; display:grid; gap: 12px; }
+    #rk-tab-overview:focus-visible ~ .rk-tabs label[for="rk-tab-overview"],
+    #rk-tab-architecture:focus-visible ~ .rk-tabs label[for="rk-tab-architecture"],
+    #rk-tab-demo:focus-visible ~ .rk-tabs label[for="rk-tab-demo"],
+    #rk-tab-security:focus-visible ~ .rk-tabs label[for="rk-tab-security"],
+    #rk-tab-artifact:focus-visible ~ .rk-tabs label[for="rk-tab-artifact"]{
+      outline: 2px solid rgba(91,75,255,.70);
+      outline-offset: 2px;
+    }
+
+    .rk-panels{
+      padding: 12px;
+      display:grid;
+      gap: 12px;
+    }
     .rk-panel{
+      display:none;
       border: 1px solid var(--rk-border);
       background: var(--rk-surface);
       border-radius: var(--rk-radius);
@@ -154,8 +207,63 @@
       line-height: 1.6;
       font-size: 14px;
     }
+
+    #rk-tab-overview:checked ~ .rk-panels [data-panel="overview"],
+    #rk-tab-architecture:checked ~ .rk-panels [data-panel="architecture"],
+    #rk-tab-demo:checked ~ .rk-panels [data-panel="demo"],
+    #rk-tab-security:checked ~ .rk-panels [data-panel="security"],
+    #rk-tab-artifact:checked ~ .rk-panels [data-panel="artifact"]{
+      display:block;
+    }
+
     .rk-grid-2{ display:grid; grid-template-columns: 1.15fr .85fr; gap: 12px; }
-    @media (max-width: 980px){ .rk-grid-2{ grid-template-columns: 1fr; } .rk-meta{justify-content:flex-start;} }
+    .rk-list{
+      margin:10px 0 0 0;
+      padding-left: 18px;
+      color: var(--rk-muted);
+      line-height: 1.55;
+      font-size: 14px;
+    }
+    .rk-code{
+      margin: 10px 0 0 0;
+      border: 1px solid var(--rk-border);
+      border-radius: 12px;
+      background: #101322;
+      color: #e5eaf8;
+      font-family: var(--rk-mono);
+      font-size: 12.5px;
+      line-height: 1.55;
+      padding: 12px;
+      overflow-x: auto;
+    }
+    .rk-kv{
+      margin: 10px 0 0 0;
+      display:grid;
+      grid-template-columns: minmax(140px, 190px) 1fr;
+      row-gap: 8px;
+      column-gap: 8px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .rk-kv dt{
+      margin:0;
+      color: var(--rk-dim);
+      font-weight: 600;
+    }
+    .rk-kv dd{
+      margin:0;
+      color: var(--rk-muted);
+    }
+    .rk-note{
+      margin-top: 10px;
+      border: 1px dashed var(--rk-border);
+      border-radius: 12px;
+      background: var(--rk-surface2);
+      padding: 10px 12px;
+      color: var(--rk-dim);
+      font-size: 13px;
+      line-height: 1.5;
+    }
 
     .rk-compare{
       margin-top: 12px;
@@ -165,7 +273,8 @@
       background: var(--rk-surface);
     }
     .rk-compare-header{
-      display:grid; grid-template-columns: 1fr 1fr;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
       border-bottom: 1px solid var(--rk-border);
       background: var(--rk-surface2);
     }
@@ -179,15 +288,17 @@
     .rk-compare-body{ display:grid; grid-template-columns: 1fr 1fr; }
     .rk-compare-col{ padding: 12px; border-right: 1px solid var(--rk-border); }
     .rk-compare-col:last-child{ border-right:none; }
-    .rk-compare-col ul{ margin:0; padding-left:18px; color:var(--rk-muted); line-height:1.55; font-size:14px;}
-    @media (max-width: 760px){
-      .rk-compare-header,.rk-compare-body{ grid-template-columns:1fr; }
-      .rk-compare-col{ border-right:none; border-bottom:1px solid var(--rk-border); }
-      .rk-compare-col:last-child{ border-bottom:none; }
+    .rk-compare-col ul{
+      margin:0;
+      padding-left:18px;
+      color:var(--rk-muted);
+      line-height:1.55;
+      font-size:14px;
     }
-
     .rk-switch{
-      display:flex; align-items:center; gap:10px;
+      display:flex;
+      align-items:center;
+      gap:10px;
       border:1px solid var(--rk-border);
       background:var(--rk-surface2);
       padding: 8px 10px;
@@ -210,8 +321,30 @@
       justify-content:space-between;
       background: var(--rk-surface2);
     }
-    .rk-footer a{ color: rgba(0,0,0,.75); text-decoration:none; border-bottom:1px dotted rgba(0,0,0,.25); }
-    .rk-footer a:hover{ color: rgba(0,0,0,.92); border-bottom-color: rgba(0,0,0,.55); }
+    .rk-footer a{
+      color: rgba(0,0,0,.75);
+      text-decoration:none;
+      border-bottom:1px dotted rgba(0,0,0,.25);
+    }
+    .rk-footer a:hover{
+      color: rgba(0,0,0,.92);
+      border-bottom-color: rgba(0,0,0,.55);
+    }
+
+    @media (max-width: 980px){
+      .rk-grid-2{ grid-template-columns: 1fr; }
+      .rk-meta{ justify-content:flex-start; }
+    }
+    @media (max-width: 760px){
+      .rk-compare-header,
+      .rk-compare-body{ grid-template-columns:1fr; }
+      .rk-compare-col{
+        border-right:none;
+        border-bottom:1px solid var(--rk-border);
+      }
+      .rk-compare-col:last-child{ border-bottom:none; }
+      .rk-kv{ grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -221,7 +354,7 @@
         <div class="rk-title">
           <h2>
             ReplayKit
-            <span class="rk-pill">Deterministic AI record • replay • diff</span>
+            <span class="rk-pill">Deterministic AI record | replay | diff</span>
             <span class="rk-pill">Local-first</span>
           </h2>
           <p class="rk-sub">
@@ -229,82 +362,175 @@
             and diffs runs to find the first divergence.
           </p>
           <div class="rk-actions">
-            <a class="rk-btn primary" href="https://github.com/golden0320230-lab/Replay-Kit" target="_blank" rel="noopener">View Repo ↗</a>
-            <a class="rk-btn" href="https://github.com/golden0320230-lab/Replay-Kit#quickstart-runnable-now" target="_blank" rel="noopener">Quickstart</a>
-            <a class="rk-btn" href="https://github.com/golden0320230-lab/Replay-Kit/tree/main/docs" target="_blank" rel="noopener">Docs</a>
+            <a class="rk-btn primary" href="https://github.com/aelasmar01/Replay-Kit" target="_blank" rel="noopener">View Repo -&gt;</a>
+            <a class="rk-btn" href="https://github.com/aelasmar01/Replay-Kit#quickstart-runnable-now" target="_blank" rel="noopener">Quickstart</a>
+            <a class="rk-btn" href="https://github.com/aelasmar01/Replay-Kit/tree/main/docs" target="_blank" rel="noopener">Docs</a>
           </div>
         </div>
 
         <div class="rk-meta">
-          <div class="rk-badge"><span class="rk-dot accent"></span> CI: Linux • macOS • Windows</div>
+          <div class="rk-badge"><span class="rk-dot accent"></span> CI: Linux | macOS | Windows</div>
           <div class="rk-badge"><span class="rk-dot good"></span> Python: 3.10+ (CI: 3.12)</div>
           <div class="rk-badge"><span class="rk-dot"></span> Artifacts: .rpk</div>
         </div>
       </header>
 
-      <nav class="rk-tabs" aria-label="ReplayKit sections">
-        <div class="rk-tab" aria-selected="true">Overview</div>
-        <div class="rk-tab" aria-selected="false">Architecture</div>
-        <div class="rk-tab" aria-selected="false">Demo</div>
-        <div class="rk-tab" aria-selected="false">Security</div>
-        <div class="rk-tab" aria-selected="false">Artifact Explorer</div>
-      </nav>
+      <div class="rk-tabset">
+        <!-- Compatibility mode: CSS-only radio tabs for reliable behavior in Google Sites embeds. -->
+        <input class="rk-tab-input" type="radio" name="rk-tabs" id="rk-tab-overview" checked />
+        <input class="rk-tab-input" type="radio" name="rk-tabs" id="rk-tab-architecture" />
+        <input class="rk-tab-input" type="radio" name="rk-tabs" id="rk-tab-demo" />
+        <input class="rk-tab-input" type="radio" name="rk-tabs" id="rk-tab-security" />
+        <input class="rk-tab-input" type="radio" name="rk-tabs" id="rk-tab-artifact" />
 
-      <div class="rk-panels">
-        <div class="rk-panel">
-          <div class="rk-grid-2">
-            <div>
-              <h3>Why it matters</h3>
-              <p>
-                AI behavior changes are hard to root-cause because prompts, model settings, and tool responses drift over time.
-                ReplayKit is designed to answer: “Why did this run behave differently?”
-              </p>
+        <nav class="rk-tabs" aria-label="ReplayKit sections">
+          <label class="rk-tab" id="rk-tab-overview-label" for="rk-tab-overview" aria-controls="rk-panel-overview">Overview</label>
+          <label class="rk-tab" id="rk-tab-architecture-label" for="rk-tab-architecture" aria-controls="rk-panel-architecture">Architecture</label>
+          <label class="rk-tab" id="rk-tab-demo-label" for="rk-tab-demo" aria-controls="rk-panel-demo">Demo</label>
+          <label class="rk-tab" id="rk-tab-security-label" for="rk-tab-security" aria-controls="rk-panel-security">Security</label>
+          <label class="rk-tab" id="rk-tab-artifact-label" for="rk-tab-artifact" aria-controls="rk-panel-artifact">Artifact Explorer</label>
+        </nav>
 
-              <label class="rk-switch">
-                <span>Before</span>
-                <input type="checkbox" id="toggle" />
-                <span>After</span>
-              </label>
+        <div class="rk-panels">
+          <section class="rk-panel" id="rk-panel-overview" data-panel="overview" role="region" aria-labelledby="rk-tab-overview-label">
+            <div class="rk-grid-2">
+              <div>
+                <h3>Why it matters</h3>
+                <p>
+                  AI behavior changes are hard to root-cause because prompts, model settings, and tool responses drift over time.
+                  ReplayKit is designed to answer: "Why did this run behave differently?"
+                </p>
 
-              <div class="rk-compare">
-                <div class="rk-compare-header">
-                  <div id="leftTitle">Without ReplayKit</div>
-                  <div id="rightTitle">With ReplayKit</div>
-                </div>
-                <div class="rk-compare-body">
-                  <div class="rk-compare-col">
-                    <ul id="leftList">
-                      <li>Non-deterministic changes are “vibes-based” to debug</li>
-                      <li>Logs are incomplete or too sensitive to share</li>
-                      <li>Reproductions depend on external services staying identical</li>
-                      <li>Hard to isolate the first breaking change</li>
-                    </ul>
+                <label class="rk-switch">
+                  <span>Before</span>
+                  <input type="checkbox" id="toggle" />
+                  <span>After</span>
+                </label>
+
+                <div class="rk-compare">
+                  <div class="rk-compare-header">
+                    <div id="leftTitle">Without ReplayKit</div>
+                    <div id="rightTitle">With ReplayKit</div>
                   </div>
-                  <div class="rk-compare-col">
-                    <ul id="rightList">
-                      <li>Deterministic .rpk artifacts for stable replay</li>
-                      <li>Offline replay (stub) + selective rerun (hybrid)</li>
-                      <li>Structured diff with first-divergence detection</li>
-                      <li>Redacted bundle export + integrity verification</li>
-                    </ul>
+                  <div class="rk-compare-body">
+                    <div class="rk-compare-col">
+                      <ul id="leftList">
+                        <li>Non-deterministic changes are hard to debug</li>
+                        <li>Logs are incomplete or too sensitive to share</li>
+                        <li>Reproductions depend on external services staying identical</li>
+                        <li>It is difficult to isolate the first breaking change</li>
+                      </ul>
+                    </div>
+                    <div class="rk-compare-col">
+                      <ul id="rightList">
+                        <li>Deterministic .rpk artifacts for stable replay</li>
+                        <li>Offline replay (stub) plus selective rerun (hybrid)</li>
+                        <li>Structured diff with first-divergence detection</li>
+                        <li>Redacted bundle export plus integrity verification</li>
+                      </ul>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div>
-              <h3>What it demonstrates</h3>
-              <p>
-                Determinism engineering, provider-agnostic capture, security-first redaction defaults, and cross-platform CI validation.
-              </p>
+              <div>
+                <h3>What it demonstrates</h3>
+                <p>
+                  Determinism engineering, provider-agnostic capture, security-first redaction defaults, and cross-platform CI validation.
+                </p>
+              </div>
             </div>
-          </div>
+          </section>
+
+          <section class="rk-panel" id="rk-panel-architecture" data-panel="architecture" role="region" aria-labelledby="rk-tab-architecture-label">
+            <div class="rk-grid-2">
+              <div>
+                <h3>System flow</h3>
+                <p>ReplayKit captures boundary events and serializes them into deterministic artifacts that can replay offline.</p>
+                <ol class="rk-list">
+                  <li>Capture model requests, prompts, tool calls, and outputs.</li>
+                  <li>Normalize and redact sensitive fields.</li>
+                  <li>Store run state as a deterministic `.rpk` bundle.</li>
+                  <li>Replay and diff runs to find first divergence.</li>
+                </ol>
+              </div>
+              <div>
+                <h3>Reliability layers</h3>
+                <ul class="rk-list">
+                  <li>Deterministic serialization for reproducible state.</li>
+                  <li>Provider-agnostic adapters for model interfaces.</li>
+                  <li>CI coverage across Linux, macOS, and Windows.</li>
+                  <li>Artifact checksums to verify integrity.</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <section class="rk-panel" id="rk-panel-demo" data-panel="demo" role="region" aria-labelledby="rk-tab-demo-label">
+            <div class="rk-grid-2">
+              <div>
+                <h3>Quick workflow</h3>
+                <p>Capture one run, replay it locally, then diff it against a modified run to pinpoint behavior changes.</p>
+                <pre class="rk-code"><code>replaykit capture --config examples/support_bot.yaml
+replaykit replay --artifact runs/support_bot.rpk
+replaykit diff --base runs/baseline.rpk --head runs/new_prompt.rpk</code></pre>
+              </div>
+              <div>
+                <h3>Expected output</h3>
+                <ul class="rk-list">
+                  <li>Replay summary with deterministic step counts.</li>
+                  <li>First-divergence report with exact event path.</li>
+                  <li>Machine-readable diff output for CI gating.</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <section class="rk-panel" id="rk-panel-security" data-panel="security" role="region" aria-labelledby="rk-tab-security-label">
+            <div class="rk-grid-2">
+              <div>
+                <h3>Security model</h3>
+                <p>ReplayKit is designed for least-privilege sharing of reproducible runs, even across teams.</p>
+                <ul class="rk-list">
+                  <li>Redaction defaults for API keys, secrets, and sensitive payloads.</li>
+                  <li>Export controls for shareable, minimal artifacts.</li>
+                  <li>Integrity verification before replay or review.</li>
+                </ul>
+              </div>
+              <div>
+                <h3>Operational safeguards</h3>
+                <ul class="rk-list">
+                  <li>Offline replay mode to avoid accidental data egress.</li>
+                  <li>Deterministic logs to prevent hidden mutation drift.</li>
+                  <li>Clear diff provenance to support audit trails.</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+
+          <section class="rk-panel" id="rk-panel-artifact" data-panel="artifact" role="region" aria-labelledby="rk-tab-artifact-label">
+            <h3>Artifact Explorer</h3>
+            <p>Each `.rpk` package captures enough execution context to replay, inspect, and compare runs consistently.</p>
+            <dl class="rk-kv">
+              <dt>manifest.json</dt>
+              <dd>Run metadata, adapters, schema version, and checksums.</dd>
+              <dt>events.ndjson</dt>
+              <dd>Ordered capture stream of prompts, tool IO, and model outputs.</dd>
+              <dt>redaction_map.json</dt>
+              <dd>Tokenized placeholders for sensitive fields, never raw secrets.</dd>
+              <dt>diff_snapshot.json</dt>
+              <dd>Optional precomputed indices for faster first-divergence lookup.</dd>
+            </dl>
+            <div class="rk-note">
+              Artifact inspection is read-only in this embed. Use the full repo tooling for extraction and validation.
+            </div>
+          </section>
         </div>
       </div>
 
       <footer class="rk-footer">
-        <div>Determinism engineering • Debug ergonomics • Security-first artifacts</div>
-        <div><a href="https://github.com/golden0320230-lab/Replay-Kit" target="_blank" rel="noopener">ReplayKit on GitHub</a></div>
+        <div>Determinism engineering | Debug ergonomics | Security-first artifacts</div>
+        <div><a href="https://github.com/aelasmar01/Replay-Kit" target="_blank" rel="noopener">ReplayKit on GitHub</a></div>
       </footer>
     </section>
   </div>
@@ -320,16 +546,16 @@
       lt: "Without ReplayKit",
       rt: "With ReplayKit",
       l: [
-        "Non-deterministic changes are “vibes-based” to debug",
+        "Non-deterministic changes are hard to debug",
         "Logs are incomplete or too sensitive to share",
         "Reproductions depend on external services staying identical",
-        "Hard to isolate the first breaking change"
+        "It is difficult to isolate the first breaking change"
       ],
       r: [
         "Deterministic .rpk artifacts for stable replay",
-        "Offline replay (stub) + selective rerun (hybrid)",
+        "Offline replay (stub) plus selective rerun (hybrid)",
         "Structured diff with first-divergence detection",
-        "Redacted bundle export + integrity verification"
+        "Redacted bundle export plus integrity verification"
       ]
     };
 
@@ -337,9 +563,9 @@
       lt: "After (Symptoms)",
       rt: "After (ReplayKit Fix)",
       l: [
-        "A model/provider update changes output shape",
+        "A model or provider update changes output shape",
         "A tool response drifts or times out",
-        "RAG retrieval returns different docs",
+        "RAG retrieval returns different documents",
         "One prompt tweak creates a cascade"
       ],
       r: [
@@ -350,14 +576,17 @@
       ]
     };
 
-    function render(s){
-      leftTitle.textContent = s.lt;
-      rightTitle.textContent = s.rt;
-      leftList.innerHTML = s.l.map(x=>`<li>${x}</li>`).join("");
-      rightList.innerHTML = s.r.map(x=>`<li>${x}</li>`).join("");
+    function render(state){
+      leftTitle.textContent = state.lt;
+      rightTitle.textContent = state.rt;
+      leftList.innerHTML = state.l.map((item) => "<li>" + item + "</li>").join("");
+      rightList.innerHTML = state.r.map((item) => "<li>" + item + "</li>").join("");
     }
-    render(BEFORE);
-    t.addEventListener("change", ()=> render(t.checked ? AFTER : BEFORE));
+
+    if (t && leftTitle && rightTitle && leftList && rightList){
+      render(BEFORE);
+      t.addEventListener("change", () => render(t.checked ? AFTER : BEFORE));
+    }
   </script>
 </body>
 </html>
